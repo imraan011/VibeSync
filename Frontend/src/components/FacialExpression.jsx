@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import * as faceapi from "face-api.js";
 export default function FacialExpression() {
     const videoRef = useRef();
-    const canvasRef = useRef();
     useEffect(() => {
         const loadModels = async () => {
             const MODEL_URL = "/models";
@@ -17,39 +16,43 @@ export default function FacialExpression() {
                 })
                 .catch((err) => console.error("Error accessing webcam: ", err));
         };
-        const handleVideoPlay = () => {
-            setInterval(async () => {
-                const detections = await faceapi
-                    .detectAllFaces(
-                        videoRef.current,
-                        new faceapi.TinyFaceDetectorOptions(),
-                    )
-                    .withFaceExpressions();
-            console.log(detections[0].expressions);
-            }, 3000);
-        };
+
         loadModels().then(startVideo);
-        videoRef.current &&
-            videoRef.current.addEventListener("play", handleVideoPlay);
     }, []);
+    async function detectMood() {
+        const detections = await faceapi
+            .detectAllFaces(
+                videoRef.current,
+                new faceapi.TinyFaceDetectorOptions(),
+            )
+            .withFaceExpressions();
+
+        let mostProbableExp = 0;
+        let mostProbableExpression = "";
+        if (detections.length === 0) {
+            console.log("No face detected");
+            return;
+        }
+        for (const expression in detections[0].expressions) {
+            if (detections[0].expressions[expression] > mostProbableExp) {
+                mostProbableExp = detections[0].expressions[expression];
+                mostProbableExpression = expression;
+            }
+        }
+
+        console.log(mostProbableExpression);
+    }
     return (
-        <div style={{ position: "relative" }}>
-            <video
-                ref={videoRef}
-                autoPlay
-                muted
-                style={{ width: "720px", height: "560px" }}
-            />
-            <canvas
-                ref={canvasRef}
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "720px",
-                    height: "560px",
-                }}
-            />
-        </div>
+        <>
+            <div style={{ position: "relative" }}>
+                <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    style={{ width: "720px", height: "560px" }}
+                />
+            </div>
+            <button onClick={detectMood}>Detect Mode</button>
+        </>
     );
 }
