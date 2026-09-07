@@ -1,0 +1,85 @@
+/* MoodDetector section styling */
+.mood-detector {
+  padding: 2.5rem 2rem 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.mood-detector__heading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111118;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+/* 2-column layout: Camera box on left, text/CTA on right */
+.mood-detector__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 2.5rem;
+}
+
+/* Camera box with video stream */
+.mood-detector__camera {
+  flex-shrink: 0;
+  width: 380px;
+  height: 250px;
+  background-color: #1a1a24;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.mood-detector__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Info container */
+.mood-detector__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+.mood-detector__info-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111118;
+  margin-bottom: 0.5rem;
+}
+
+.mood-detector__info-desc {
+  font-size: 0.95rem;
+  color: #6b6b8a;
+  line-height: 1.5;
+  max-width: 320px;
+  margin-bottom: 1.5rem;
+}
+
+/* Start listening button */
+.mood-detector__btn {
+  align-self: flex-start;
+  padding: 0.65rem 1.5rem;
+  background-color: #5b21b6;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(91, 33, 182, 0.25);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.mood-detector__btn:hover {
+  background-color: #4c1d95;
+}
+
+.mood-detector__btn:active {
+  transform: scale(0.98);
+}
