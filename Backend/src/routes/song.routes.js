@@ -42,7 +42,7 @@ router.get("/songs", async (req, res) => {
     });
     res.status(200).json({
         message: "song fetched sucessfully",
-        song
+        song,
     });
 });
 

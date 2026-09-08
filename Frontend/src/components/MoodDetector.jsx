@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from "react";
 import * as faceapi from "face-api.js";
 import "./MoodDetector.css";
 
-export default function MoodDetector() {
+export default function MoodDetector({ setTracks }) {
+    
     const videoRef = useRef();
 
     useEffect(() => {
@@ -70,10 +71,12 @@ export default function MoodDetector() {
 
                 {/* Info panel + Detect button */}
                 <div className="mood-detector__info">
-                    <h2 className="mood-detector__info-title">Live Mood Detection</h2>
+                    <h2 className="mood-detector__info-title">
+                        Live Mood Detection
+                    </h2>
                     <p className="mood-detector__info-desc">
-                        Your current mood is being analyzed in real-time. Enjoy music
-                        tailored to your feelings.
+                        Your current mood is being analyzed in real-time. Enjoy
+                        music tailored to your feelings.
                     </p>
                     <button
                         id="start-listening-btn"
