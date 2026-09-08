@@ -37,12 +37,12 @@ router.post("/songs", upload.single("audio"), async (req, res) => {
 router.get("/songs", async (req, res) => {
     const mood = req.query.mood;
 
-    const song = await songmodel.find({
+    const songs = await songmodel.find({
         mood: mood,
     });
     res.status(200).json({
         message: "song fetched sucessfully",
-        song,
+        songs,
     });
 });
 

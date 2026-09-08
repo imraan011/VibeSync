@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import * as faceapi from "face-api.js";
 import "./MoodDetector.css";
+import axios from "axios";
 
 export default function MoodDetector({ setTracks }) {
-    
     const videoRef = useRef();
 
     useEffect(() => {
@@ -50,6 +50,14 @@ export default function MoodDetector({ setTracks }) {
         }
 
         console.log("Detected Mood:", mostProbableExpression);
+
+        //api hit karege using axios GET server response according to mood detected
+        axios
+            .get(`http://localhost:3000/songs?mood=${mostProbableExpression}`)
+            .then((res) => {
+                console.log(res.data.songs);
+                setTracks(res.data.songs)
+            });
     }
 
     return (

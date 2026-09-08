@@ -20,17 +20,15 @@ function PlayIcon() {
 }
 
 // Placeholder — onPlay baad me connect hoga audio player se
-function TrackItem({ title, artist }) {
+function TrackItem({ title, artist, audio }) {
     return (
         <li className="track-item">
             <div className="track-item__meta">
                 <span className="track-item__title">{title}</span>
                 <span className="track-item__artist">{artist}</span>
             </div>
-            <button
-                className="track-item__play-btn"
-                aria-label={`Play ${title} by ${artist}`}
-            >
+            <audio src={audio} controls></audio>
+            <button className="track-item__play-btn">
                 <PlayIcon />
             </button>
         </li>
