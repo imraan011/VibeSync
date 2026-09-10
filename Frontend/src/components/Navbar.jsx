@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { NAV_LINKS } from "../data/mockData";
 import "./Navbar.css";
 
-export default function Navbar() {
-    const [activeTab, setActiveTab] = useState("live-space");
-
+export default function Navbar({ activeTab = "live-space", onTabChange }) {
     return (
         <header className="navbar">
             {/* Logo & Subtitle */}
-            <div className="navbar__brand">
+            <div className="navbar__brand" onClick={() => onTabChange && onTabChange("live-space")} style={{ cursor: "pointer" }}>
                 <span className="navbar__logo">VibeSync</span>
                 <span className="navbar__subtitle">Mood-Adaptive Audio</span>
             </div>
@@ -20,7 +18,7 @@ export default function Navbar() {
                         key={tab.id}
                         type="button"
                         className={`navbar__tab ${activeTab === tab.id ? "navbar__tab--active" : ""}`}
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => onTabChange && onTabChange(tab.id)}
                     >
                         {tab.label}
                     </button>

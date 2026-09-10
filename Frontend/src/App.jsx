@@ -4,6 +4,7 @@ import * as faceapi from "face-api.js";
 import Navbar from "./components/Navbar";
 import CameraFeed from "./components/CameraFeed";
 import NowPlayingDisk from "./components/NowPlayingDisk";
+import LibraryView from "./components/LibraryView";
 import PlayerBar from "./components/PlayerBar";
 import { MOOD_DISPLAY_MAP } from "./data/mockData";
 
@@ -11,6 +12,7 @@ const API_BASE_URL = "http://localhost:3000";
 
 export default function App() {
     const videoRef = useRef(null);
+    const [activeTab, setActiveTab] = useState("live-space");
     const [activeMoodId, setActiveMoodId] = useState("neutral");
     const [currentMoodLabel, setCurrentMoodLabel] = useState("Calm & Centered");
     const [matchScore, setMatchScore] = useState(92);
@@ -146,27 +148,40 @@ export default function App() {
 
     return (
         <div className="app-container">
-            <Navbar />
-            <main className="main-content">
-                {/* Left Panel: Camera Stream View */}
-                <div className="left-panel">
-                    <CameraFeed
-                        videoRef={videoRef}
-                        isScanning={isScanning}
-                        onManualScan={handleManualScan}
-                    />
-                </div>
+            {/* Top Navigation Bar with active tab control */}
+            <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
 
-                {/* Right Panel: Now Playing Spinning Vinyl Disc & Mood Info */}
-                <div className="right-panel">
-                    <NowPlayingDisk
-                        activeTrack={activeTrack}
-                        activeMoodId={activeMoodId}
-                        matchScore={matchScore}
-                        isPlaying={isPlaying}
-                    />
-                </div>
+            <main className="main-content">
+                {activeTab === "live-space" ? (
+                    <>
+                        {/* Left Panel: Camera Stream View */}
+                        <div className="left-panel">
+                            <CameraFeed
+                                videoRef={videoRef}
+                                isScanning={isScanning}
+                                onManualScan={handleManualScan}
+                            />
+                        </div>
+
+                        {/* Right Panel: Now Playing Spinning Vinyl Disc & Mood Info */}
+                        <div className="right-panel">
+                            <NowPlayingDisk
+                                activeTrack={activeTrack}
+                                activeMoodId={activeMoodId}
+                                matchScore={matchScore}
+                                isPlaying={isPlaying}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    /* Full-width Lazy Loaded Music Library View */
+                    <div style={{ gridColumn: "1 / -1", width: "100%" }}>
+                        <LibraryView />
+                    </div>
+                )}
             </main>
+
+            {/* Persistent Audio Player Bar */}
             <PlayerBar
                 currentTrack={activeTrack}
                 isPlaying={isPlaying}
