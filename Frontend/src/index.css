@@ -1,28 +1,91 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 :root {
-  --bg: #f0f0f7;
-  --surface: #ffffff;
-  --border: #e2e2ec;
-  --text-primary: #111118;
-  --text-secondary: #6b6b8a;
-  --accent: #5b21b6;
-  --accent-hover: #4c1d95;
-  --accent-text: #ffffff;
-  --track-hover: #e8e8f4;
-  --play-icon: #1a1a2e;
+  --bg-main: #0c0d12;
+  --bg-surface: #141620;
+  --bg-surface-elevated: #1a1d2c;
+  --bg-pill: #1a1c26;
+  --bg-pill-hover: #222533;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(45, 212, 191, 0.4);
+  --text-primary: #f3f4f8;
+  --text-secondary: #8e92a4;
+  --text-muted: #5d6174;
+  --accent-teal: #2dd4bf;
+  --accent-teal-glow: rgba(45, 212, 191, 0.15);
+  --accent-green: #22c55e;
 }
 
 html, body, #root {
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
-  background-color: var(--bg);
+  background-color: var(--bg-main);
   color: var(--text-primary);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* App Container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 90px; /* Space for bottom player bar */
+}
+
+/* Main Dashboard Grid */
+.main-content {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 1.75rem;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.25rem 2rem 2rem;
+}
+
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive adjustment */
+@media (max-width: 1024px) {
+  .main-content {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1.25rem;
+  }
 }

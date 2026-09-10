@@ -1,18 +1,19 @@
 const express = require("express");
-const songRoute = require("./routes/song.routes");
 const cors = require("cors");
+const songRoute = require("./routes/song.routes");
 
 const app = express();
 
-//middelware for express requtest read
 app.use(express.json());
 app.use(cors());
-//routes
+
+// Routes
 app.use("/", songRoute);
 
 app.get("/", (req, res) => {
     res.json({
-        Response: " fuck you",
+        status: "online",
+        message: "VibeSync Audio Backend API is running",
     });
 });
 

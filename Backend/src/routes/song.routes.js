@@ -5,7 +5,6 @@ const songmodel = require("../models/song.model");
 
 const router = express.Router();
 
-// RAM me temporary store karo — multer memoryStorage
 const upload = multer({
     storage: multer.memoryStorage(),
 });
@@ -34,16 +33,39 @@ router.post("/songs", upload.single("audio"), async (req, res) => {
     }
 });
 
+// Lazy loaded / paginated & mood-based songs fetch
 router.get("/songs", async (req, res) => {
-    const mood = req.query.mood;
+    try {
+        const { mood, page, limit } = req.query;
+        const query = mood ? { mood } : {};
 
-    const songs = await songmodel.find({
-        mood: mood,
-    });
-    res.status(200).json({
-        message: "song fetched sucessfully",
-        songs,
-    });
+        if (page || limit) {
+            const pageNum = parseInt(page, 10) || 1;
+            const limitNum = parseInt(limit, 10) || 20;
+            const skip = (pageNum - 1) * limitNum;
+
+            const total = await songmodel.countDocuments(query);
+            const songs = await songmodel.find(query).skip(skip).limit(limitNum);
+
+            return res.status(200).json({
+                message: "Songs fetched successfully",
+                songs,
+                page: pageNum,
+                totalPages: Math.ceil(total / limitNum),
+                total,
+                hasMore: skip + songs.length < total,
+            });
+        }
+
+        const songs = await songmodel.find(query);
+        res.status(200).json({
+            message: "song fetched sucessfully",
+            songs,
+            total: songs.length,
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 module.exports = router;

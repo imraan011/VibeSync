@@ -1,26 +1,140 @@
 .navbar {
-  display: flex;
-  align-items: center;
-  padding: 0 2rem;
-  height: 56px;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 2rem;
+    background-color: var(--bg-main);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.navbar__brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
 }
 
 .navbar__logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
 }
 
-.navbar__icon {
-  font-size: 0.85rem;
-  color: var(--text-primary);
+.navbar__subtitle {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-muted);
 }
 
-.navbar__title {
-  font-size: 1.32rem;
-  font-weight: 900;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
+/* Center Pill Tabs */
+.navbar__tabs {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 9999px;
+    padding: 0.25rem;
+    gap: 0.2rem;
+}
+
+.navbar__tab {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 0.45rem 1.15rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.navbar__tab:hover {
+    color: var(--text-primary);
+}
+
+.navbar__tab--active {
+    background-color: var(--bg-surface-elevated);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Right Section */
+.navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.navbar__status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.navbar__status-dot {
+    width: 7px;
+    height: 7px;
+    background-color: var(--accent-teal);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-teal);
+    display: inline-block;
+    animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.15); }
+}
+
+.navbar__icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    border-radius: 50%;
+    transition: color 0.2s ease;
+}
+
+.navbar__icon-btn:hover {
+    color: var(--text-primary);
+}
+
+.navbar__avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.navbar__avatar:hover {
+    border-color: var(--accent-teal);
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.75rem 1rem;
+    }
+    .navbar__subtitle, .navbar__status-badge {
+        display: none;
+    }
 }

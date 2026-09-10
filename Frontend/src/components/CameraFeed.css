@@ -1,0 +1,104 @@
+.camera-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+}
+
+.camera-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.25rem;
+    font-size: 0.82rem;
+}
+
+.camera-section__status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.camera-section__dot {
+    width: 7px;
+    height: 7px;
+    background-color: var(--accent-teal);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-teal);
+    display: inline-block;
+}
+
+.camera-section__actions-top {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.camera-section__meta {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.camera-section__scan-btn {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-active);
+    color: var(--accent-teal);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.camera-section__scan-btn:hover {
+    background-color: rgba(45, 212, 191, 0.15);
+    transform: scale(1.05);
+}
+
+.camera-section__viewport {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9.5;
+    background-color: #12131a;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+.camera-section__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.camera-section__video--active {
+    opacity: 1;
+}
+
+.camera-section__fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.camera-section__poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera-section__vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 60% 50%, rgba(0, 0, 0, 0.1) 0%, rgba(12, 13, 18, 0.6) 100%);
+    pointer-events: none;
+}
