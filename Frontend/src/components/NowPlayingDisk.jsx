@@ -20,8 +20,8 @@ export default function NowPlayingDisk({
                 <div
                     className="now-playing-panel__mood-badge"
                     style={{
-                        borderColor: `rgba(${activeMoodId === 'happy' ? '245, 158, 11' : activeMoodId === 'sad' ? '168, 85, 247' : activeMoodId === 'surprised' ? '244, 63, 94' : activeMoodId === 'angry' ? '239, 68, 68' : '45, 212, 191'}, 0.35)`,
-                        backgroundColor: `rgba(${activeMoodId === 'happy' ? '245, 158, 11' : activeMoodId === 'sad' ? '168, 85, 247' : activeMoodId === 'surprised' ? '244, 63, 94' : activeMoodId === 'angry' ? '239, 68, 68' : '45, 212, 191'}, 0.08)`
+                        borderColor: `${moodInfo.color}55`,
+                        backgroundColor: `${moodInfo.color}12`,
                     }}
                 >
                     <span

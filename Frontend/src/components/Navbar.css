@@ -2,9 +2,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.85rem 2rem;
-    background-color: var(--bg-main);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 0.9rem 2.2rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-subtle);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
 .navbar__brand {
@@ -14,24 +15,24 @@
 }
 
 .navbar__logo {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.02em;
+    color: #0f172a;
+    letter-spacing: -0.03em;
 }
 
 .navbar__subtitle {
     font-size: 0.82rem;
     font-weight: 500;
-    color: var(--text-muted);
+    color: var(--text-secondary);
 }
 
 /* Center Pill Tabs */
 .navbar__tabs {
     display: flex;
     align-items: center;
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
+    background-color: #f1f5f9;
+    border: 1px solid rgba(15, 23, 42, 0.06);
     border-radius: 9999px;
     padding: 0.25rem;
     gap: 0.2rem;
@@ -40,7 +41,7 @@
 .navbar__tab {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: #64748b;
     font-size: 0.84rem;
     font-weight: 600;
     padding: 0.45rem 1.15rem;
@@ -50,13 +51,13 @@
 }
 
 .navbar__tab:hover {
-    color: var(--text-primary);
+    color: #0f172a;
 }
 
 .navbar__tab--active {
-    background-color: var(--bg-surface-elevated);
-    color: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    background-color: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
 }
 
 /* Right Section */
@@ -70,87 +71,70 @@
     display: flex;
     align-items: center;
     gap: 0.45rem;
-    background: rgba(45, 212, 191, 0.12);
-    border: 1px solid var(--accent-teal);
-    color: var(--accent-teal);
+    background: #0d9488;
+    border: 1px solid #0d9488;
+    color: #ffffff;
     font-size: 0.82rem;
-    font-weight: 700;
-    padding: 0.4rem 0.95rem;
+    font-weight: 600;
+    padding: 0.45rem 1rem;
     border-radius: 9999px;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25);
 }
 
 .navbar__upload-btn:hover {
-    background: var(--accent-teal);
-    color: #0c0d12;
-    box-shadow: 0 0 14px rgba(45, 212, 191, 0.4);
+    background: #0f766e;
+    border-color: #0f766e;
     transform: translateY(-1px);
 }
-
 
 .navbar__status-badge {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: var(--bg-surface);
+    background-color: #f8fafc;
     border: 1px solid var(--border-subtle);
     padding: 0.4rem 0.9rem;
     border-radius: 9999px;
     font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--text-secondary);
+    font-weight: 600;
+    color: #475569;
 }
 
 .navbar__status-dot {
     width: 7px;
     height: 7px;
-    background-color: var(--accent-teal);
+    background-color: #0d9488;
     border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent-teal);
+    box-shadow: 0 0 8px rgba(13, 148, 136, 0.6);
     display: inline-block;
     animation: pulseGlow 2.5s infinite ease-in-out;
 }
 
 @keyframes pulseGlow {
     0%, 100% { opacity: 0.7; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.15); }
-}
-
-.navbar__icon-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.4rem;
-    border-radius: 50%;
-    transition: color 0.2s ease;
-}
-
-.navbar__icon-btn:hover {
-    color: var(--text-primary);
+    50% { opacity: 1; transform: scale(1.2); }
 }
 
 .navbar__avatar {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background-color: var(--bg-surface-elevated);
+    background-color: #f1f5f9;
     border: 1px solid var(--border-subtle);
-    color: var(--text-secondary);
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: border-color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .navbar__avatar:hover {
-    border-color: var(--accent-teal);
-    color: var(--text-primary);
+    border-color: #0d9488;
+    color: #0f172a;
+    background-color: #e2e8f0;
 }
 
 @media (max-width: 768px) {
@@ -161,3 +145,4 @@
         display: none;
     }
 }
+

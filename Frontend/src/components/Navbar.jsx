@@ -42,17 +42,9 @@ export default function Navbar({ activeTab = "live-space", onTabChange, onOpenUp
                     </button>
                 )}
 
-                <div className="navbar__status-badge">
-                    <span className="navbar__status-dot" aria-hidden="true" />
-                    <span>Live Biometric Radar</span>
-                </div>
+               
 
-                <div className="navbar__avatar" title="User Profile" aria-label="User Profile">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                    </svg>
-                </div>
+                 
             </div>
         </header>
     );

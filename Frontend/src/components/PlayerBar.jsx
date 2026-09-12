@@ -1,8 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./PlayerBar.css";
+import { MOOD_DISPLAY_MAP } from "../data/mockData";
+
+const MOOD_EMOJI_MAP = {
+    happy: "😄",
+    neutral: "😌",
+    sad: "🌧️",
+    surprised: "⚡",
+    angry: "🔥",
+    fearful: "🌌",
+    disgusted: "🎸",
+};
 
 export default function PlayerBar({
     currentTrack,
+    activeMoodId = "happy",
     isPlaying = false,
     onTogglePlay,
     onSongEnd,
@@ -10,9 +22,17 @@ export default function PlayerBar({
     const audioRef = useRef(null);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [volume, setVolume] = useState(75);
-    const [isShuffle, setIsShuffle] = useState(false);
-    const [isRepeat, setIsRepeat] = useState(false);
+    const [volume, setVolume] = useState(80);
+    const [prevVolume, setPrevVolume] = useState(80);
+    const [isMuted, setIsMuted] = useState(false);
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
+
+    const moodKey = currentTrack?.mood || activeMoodId || "happy";
+    const moodMeta = MOOD_DISPLAY_MAP[moodKey] || {
+        label: "Happy",
+        color: "#f59e0b",
+    };
+    const moodEmoji = MOOD_EMOJI_MAP[moodKey] || "😄";
 
     // Audio play/pause sync
     useEffect(() => {
@@ -27,24 +47,69 @@ export default function PlayerBar({
     // Volume change handler
     const handleVolumeChange = (newVol) => {
         setVolume(newVol);
+        if (newVol > 0) setIsMuted(false);
         if (audioRef.current) {
             audioRef.current.volume = newVol / 100;
         }
     };
 
-    // Format seconds to mm:ss
-    const formatTime = (secs) => {
-        if (isNaN(secs) || secs === 0) return "00:00";
-        const m = Math.floor(secs / 60);
-        const s = Math.floor(secs % 60);
-        return `${m < 10 ? "0" : ""}${m}:${s < 10 ? "0" : ""}${s}`;
+    // Mute toggle handler
+    const handleToggleMute = () => {
+        if (isMuted || volume === 0) {
+            const restore = prevVolume > 0 ? prevVolume : 80;
+            setVolume(restore);
+            setIsMuted(false);
+            if (audioRef.current) audioRef.current.volume = restore / 100;
+        } else {
+            setPrevVolume(volume);
+            setVolume(0);
+            setIsMuted(true);
+            if (audioRef.current) audioRef.current.volume = 0;
+        }
     };
 
-    const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 40;
+    // Skip time (+5s or -5s)
+    const handleSkip = (seconds) => {
+        if (!audioRef.current) return;
+        const newTime = Math.min(Math.max(0, audioRef.current.currentTime + seconds), duration || 1000);
+        audioRef.current.currentTime = newTime;
+        setCurrentTime(newTime);
+    };
+
+    // Interactive scrubber seek
+    const handleSeekChange = (e) => {
+        const seekVal = Number(e.target.value);
+        setCurrentTime(seekVal);
+        if (audioRef.current) {
+            audioRef.current.currentTime = seekVal;
+        }
+    };
+
+    // Cycle playback speed
+    const handleCycleSpeed = () => {
+        const speeds = [1, 1.25, 1.5, 2, 0.75];
+        const currentIndex = speeds.indexOf(playbackSpeed);
+        const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
+        setPlaybackSpeed(nextSpeed);
+        if (audioRef.current) {
+            audioRef.current.playbackRate = nextSpeed;
+        }
+    };
+
+    // Format seconds to m:ss
+    const formatTime = (secs) => {
+        if (isNaN(secs) || secs <= 0) return "0:00";
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60);
+        return `${m}:${s < 10 ? "0" : ""}${s}`;
+    };
+
+    const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+    const volumePercent = volume;
 
     return (
         <footer className="player-bar" aria-label="Audio Playback Bar">
-            {/* Native Audio Element for Playback */}
+            {/* Native Audio Element */}
             {currentTrack?.audio && (
                 <audio
                     ref={audioRef}
@@ -55,67 +120,63 @@ export default function PlayerBar({
                             setDuration(audioRef.current.duration || 0);
                         }
                     }}
+                    onLoadedMetadata={() => {
+                        if (audioRef.current) {
+                            setDuration(audioRef.current.duration || 0);
+                            audioRef.current.playbackRate = playbackSpeed;
+                        }
+                    }}
                     onEnded={onSongEnd}
                 />
             )}
 
-            {/* Top Accent Progress Line */}
-            <div className="player-bar__progress-rail">
-                <div
-                    className="player-bar__progress-fill"
-                    style={{ width: `${progressPercent}%` }}
-                />
-            </div>
-
             <div className="player-bar__container">
-                {/* Left: Track Information */}
+                {/* Left: Track Information with Mood Badge */}
                 <div className="player-bar__left">
-                    <div className="player-bar__art-box">
-                        {currentTrack?.cover ? (
-                            <img src={currentTrack.cover} alt="Cover" style={{ width: "100%", height: "100%", borderRadius: "8px", objectFit: "cover" }} />
-                        ) : (
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                            </svg>
-                        )}
+                    <div className="player-bar__art-wrap">
+                        <div className="player-bar__art-box">
+                            {currentTrack?.cover ? (
+                                <img src={currentTrack.cover} alt="Cover" className="player-bar__art-img" />
+                            ) : (
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style={{ color: moodMeta.color }}>
+                                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                                </svg>
+                            )}
+                        </div>
+                        {/* Circular Mood Emoji Badge */}
+                        <div className="player-bar__emoji-badge" title={moodMeta.label}>
+                            {moodEmoji}
+                        </div>
                     </div>
+
                     <div className="player-bar__info">
-                        <span className="player-bar__title">{currentTrack?.title || "No Track Selected"}</span>
-                        <span className="player-bar__artist">{currentTrack?.artist || "Unknown Artist"}</span>
+                        <span className="player-bar__title" title={currentTrack?.title || "No Track Selected"}>
+                            {currentTrack?.title || "No Track Selected"}
+                        </span>
+                        <div className="player-bar__mood-tag" style={{ color: moodMeta.color }}>
+                            <span>{moodEmoji}</span>
+                            <span>{moodMeta.label.split("&")[0].trim()}</span>
+                        </div>
                     </div>
                 </div>
 
-                {/* Center: Controls & Time */}
+                {/* Center: Controls + Timeline Slider */}
                 <div className="player-bar__center">
+                    {/* Top Control Buttons */}
                     <div className="player-bar__controls">
+                        {/* 5s Rewind */}
                         <button
                             type="button"
-                            className={`player-bar__btn ${isShuffle ? "player-bar__btn--active" : ""}`}
-                            onClick={() => setIsShuffle(!isShuffle)}
-                            title="Shuffle"
-                            aria-label="Shuffle"
+                            className="player-bar__skip-btn"
+                            onClick={() => handleSkip(-5)}
+                            title="Rewind 5 seconds"
+                            aria-label="Rewind 5 seconds"
                         >
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="16 3 21 3 21 8" />
-                                <line x1="4" y1="20" x2="21" y2="3" />
-                                <polyline points="21 16 21 21 16 21" />
-                                <line x1="15" y1="15" x2="21" y2="21" />
-                            </svg>
+                            <span className="skip-icon">↺</span>
+                            <span className="skip-text">5s</span>
                         </button>
 
-                        <button
-                            type="button"
-                            className="player-bar__btn"
-                            title="Previous Track"
-                            aria-label="Previous Track"
-                            onClick={onSongEnd}
-                        >
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                <polygon points="19 20 9 12 19 4 19 20" />
-                                <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" strokeWidth="2.5" />
-                            </svg>
-                        </button>
-
+                        {/* Main Play / Pause Button */}
                         <button
                             type="button"
                             className="player-bar__play-main"
@@ -124,68 +185,103 @@ export default function PlayerBar({
                             aria-label={isPlaying ? "Pause" : "Play"}
                         >
                             {isPlaying ? (
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="#000000">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                                     <rect x="6" y="5" width="3.5" height="14" rx="1" />
                                     <rect x="14.5" y="5" width="3.5" height="14" rx="1" />
                                 </svg>
                             ) : (
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="#000000" style={{ transform: "translateX(1px)" }}>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ transform: "translateX(1.5px)" }}>
                                     <polygon points="7 4 19 12 7 20 7 4" />
                                 </svg>
                             )}
                         </button>
 
+                        {/* 5s Forward */}
                         <button
                             type="button"
-                            className="player-bar__btn"
-                            title="Next Track (Triggers Mood Scan)"
-                            aria-label="Next Track"
-                            onClick={onSongEnd}
+                            className="player-bar__skip-btn"
+                            onClick={() => handleSkip(5)}
+                            title="Forward 5 seconds"
+                            aria-label="Forward 5 seconds"
                         >
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                <polygon points="5 4 15 12 5 20 5 4" />
-                                <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" strokeWidth="2.5" />
-                            </svg>
-                        </button>
-
-                        <button
-                            type="button"
-                            className={`player-bar__btn ${isRepeat ? "player-bar__btn--active" : ""}`}
-                            onClick={() => setIsRepeat(!isRepeat)}
-                            title="Repeat"
-                            aria-label="Repeat"
-                        >
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="17 1 21 5 17 9" />
-                                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                                <polyline points="7 23 3 19 7 15" />
-                                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-                            </svg>
+                            <span className="skip-text">5s</span>
+                            <span className="skip-icon">↻</span>
                         </button>
                     </div>
 
-                    <span className="player-bar__time">
-                        {currentTrack?.audio && duration > 0
-                            ? `${formatTime(currentTime)} / ${formatTime(duration)}`
-                            : `${currentTrack?.currentDuration || "03:24"} / ${currentTrack?.duration || currentTrack?.totalDuration || "08:12"}`}
-                    </span>
+                    {/* Bottom: Timeline Scrubber Slider */}
+                    <div className="player-bar__timeline-row">
+                        <span className="player-bar__time">{formatTime(currentTime)}</span>
+                        <div className="player-bar__slider-wrap">
+                            <input
+                                type="range"
+                                min="0"
+                                max={duration || 100}
+                                step="0.1"
+                                value={currentTime}
+                                onChange={handleSeekChange}
+                                className="player-bar__seek-slider"
+                                aria-label="Audio Timeline Scrubber"
+                                style={{
+                                    background: `linear-gradient(to right, #eab308 0%, #eab308 ${progressPercent}%, rgba(15, 23, 42, 0.15) ${progressPercent}%, rgba(15, 23, 42, 0.15) 100%)`,
+                                }}
+                            />
+                        </div>
+                        <span className="player-bar__time">{formatTime(duration)}</span>
+                    </div>
                 </div>
 
-                {/* Right: Volume & Queue */}
+                {/* Right: Speed, Volume, Mute */}
                 <div className="player-bar__right">
+                    {/* Playback Speed Pill */}
+                    <button
+                        type="button"
+                        className="player-bar__speed-btn"
+                        onClick={handleCycleSpeed}
+                        title="Change Playback Speed"
+                    >
+                        {playbackSpeed}x
+                    </button>
+
+                    {/* Volume Box */}
                     <div className="player-bar__volume-box">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-                        </svg>
+                        <button
+                            type="button"
+                            className="player-bar__vol-icon-btn"
+                            onClick={handleToggleMute}
+                            title={isMuted || volume === 0 ? "Unmute" : "Mute"}
+                            aria-label="Mute / Unmute"
+                        >
+                            {isMuted || volume === 0 ? (
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <line x1="23" y1="9" x2="17" y2="15" />
+                                    <line x1="17" y1="9" x2="23" y2="15" />
+                                </svg>
+                            ) : volume < 50 ? (
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                                </svg>
+                            ) : (
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                                </svg>
+                            )}
+                        </button>
+
                         <input
                             type="range"
                             min="0"
                             max="100"
-                            value={volume}
+                            value={isMuted ? 0 : volume}
                             onChange={(e) => handleVolumeChange(Number(e.target.value))}
-                            className="player-bar__volume-slider"
+                            className="player-bar__vol-slider"
                             aria-label="Volume Slider"
+                            style={{
+                                background: `linear-gradient(to right, #eab308 0%, #eab308 ${isMuted ? 0 : volumePercent}%, rgba(15, 23, 42, 0.15) ${isMuted ? 0 : volumePercent}%, rgba(15, 23, 42, 0.15) 100%)`,
+                            }}
                         />
                     </div>
                 </div>
@@ -193,3 +289,4 @@ export default function PlayerBar({
         </footer>
     );
 }
+

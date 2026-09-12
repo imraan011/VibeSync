@@ -1,8 +1,13 @@
 .camera-section {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.65rem;
     width: 100%;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-md);
 }
 
 .camera-section__header {
@@ -10,23 +15,23 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 0.25rem;
-    font-size: 0.82rem;
+    font-size: 0.84rem;
 }
 
 .camera-section__status {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
 }
 
 .camera-section__dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     background-color: var(--accent-teal);
     border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent-teal);
+    box-shadow: 0 0 8px rgba(13, 148, 136, 0.6);
     display: inline-block;
 }
 
@@ -37,36 +42,39 @@
 }
 
 .camera-section__meta {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-weight: 500;
+    font-size: 0.8rem;
 }
 
 .camera-section__scan-btn {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-active);
-    color: var(--accent-teal);
+    background-color: #f1f5f9;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    color: #0f172a;
     font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.25rem 0.65rem;
+    font-weight: 700;
+    padding: 0.3rem 0.75rem;
     border-radius: 9999px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .camera-section__scan-btn:hover {
-    background-color: rgba(45, 212, 191, 0.15);
-    transform: scale(1.05);
+    background-color: #0d9488;
+    border-color: #0d9488;
+    color: #ffffff;
+    transform: scale(1.04);
 }
 
 .camera-section__viewport {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9.5;
-    background-color: #08090d;
-    border-radius: 16px;
+    background-color: #0b0f19;
+    border-radius: 14px;
     overflow: hidden;
-    border: 1px solid var(--border-subtle);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .camera-section__video {
@@ -93,13 +101,13 @@
     align-items: center;
     justify-content: center;
     gap: 0.9rem;
-    background-color: #06070a;
+    background-color: #0b0f19;
 }
 
 .camera-section__radar-pulse {
     width: 44px;
     height: 44px;
-    border: 2px solid rgba(45, 212, 191, 0.4);
+    border: 2px solid rgba(45, 212, 191, 0.5);
     border-radius: 50%;
     animation: radarPulse 1.8s infinite ease-out;
 }
@@ -124,7 +132,8 @@
 .camera-section__loading-text {
     font-size: 0.78rem;
     font-weight: 500;
-    color: var(--text-muted);
+    color: #94a3b8;
     letter-spacing: 0.04em;
 }
+
 

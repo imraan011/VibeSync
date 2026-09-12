@@ -232,6 +232,7 @@ export default function App() {
             {/* Persistent Audio Player Bar */}
             <PlayerBar
                 currentTrack={activeTrack}
+                activeMoodId={activeMoodId}
                 isPlaying={isPlaying}
                 onTogglePlay={() => setIsPlaying(!isPlaying)}
                 onSongEnd={handleSongEnd}

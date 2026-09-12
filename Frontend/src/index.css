@@ -8,19 +8,22 @@
 }
 
 :root {
-  --bg-main: #0c0d12;
-  --bg-surface: #141620;
-  --bg-surface-elevated: #1a1d2c;
-  --bg-pill: #1a1c26;
-  --bg-pill-hover: #222533;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-active: rgba(45, 212, 191, 0.4);
-  --text-primary: #f3f4f8;
-  --text-secondary: #8e92a4;
-  --text-muted: #5d6174;
-  --accent-teal: #2dd4bf;
-  --accent-teal-glow: rgba(45, 212, 191, 0.15);
-  --accent-green: #22c55e;
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-pill: #f1f5f9;
+  --bg-pill-hover: #e2e8f0;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-active: rgba(13, 148, 136, 0.5);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent-teal: #0d9488;
+  --accent-teal-glow: rgba(13, 148, 136, 0.12);
+  --accent-green: #16a34a;
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 16px 36px rgba(15, 23, 42, 0.08);
 }
 
 html, body, #root {
@@ -32,7 +35,7 @@ html, body, #root {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom Sleek Scrollbar */
+/* Custom Minimal Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -43,12 +46,12 @@ html, body, #root {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.15);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.25);
 }
 
 /* App Container */
@@ -56,7 +59,8 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-bottom: 90px; /* Space for bottom player bar */
+  padding-bottom: 95px; /* Space for bottom player bar */
+  background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f8fafc 100%);
 }
 
 /* Main Dashboard Grid */
@@ -67,7 +71,7 @@ html, body, #root {
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
-  padding: 1.25rem 2rem 2rem;
+  padding: 1.5rem 2rem 2rem;
 }
 
 .left-panel {
