@@ -6,7 +6,7 @@ import { MOOD_DISPLAY_MAP } from "../data/mockData";
 const API_BASE_URL = "http://localhost:3000";
 const PAGE_LIMIT = 20;
 
-export default function LibraryView() {
+export default function LibraryView({ onOpenUpload }) {
     const [songs, setSongs] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -78,8 +78,20 @@ export default function LibraryView() {
                     </p>
                 </div>
 
+                {onOpenUpload && (
+                    <button
+                        type="button"
+                        onClick={onOpenUpload}
+                        className="library-filter-chip library-filter-chip--active"
+                        style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.45rem 1rem", cursor: "pointer" }}
+                    >
+                        <span>+</span> Upload Track
+                    </button>
+                )}
+
                 {/* Mood Quick Filter Chips */}
                 <div className="library-view__filters">
+
                     {moodFilterKeys.map((key) => {
                         const label = key === "all" ? "All Moods" : MOOD_DISPLAY_MAP[key]?.label || key;
                         const isSelected = selectedMoodFilter === key;

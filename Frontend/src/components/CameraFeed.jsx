@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./CameraFeed.css";
 
-const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&auto=format&fit=crop&q=80";
-
-export default function CameraFeed({ videoRef, isScanning = false, onManualScan }) {
+export default function CameraFeed({ videoRef, isScanning = false, onManualScan, onCameraReady }) {
     const [hasStream, setHasStream] = useState(false);
 
     useEffect(() => {
@@ -22,9 +20,13 @@ export default function CameraFeed({ videoRef, isScanning = false, onManualScan 
                     if (videoRef?.current) {
                         videoRef.current.srcObject = mediaStream;
                         videoRef.current.onloadedmetadata = () => {
-                            videoRef.current.play().catch(() => {});
+                            videoRef.current.play().then(() => {
+                                setHasStream(true);
+                                if (onCameraReady) {
+                                    onCameraReady();
+                                }
+                            }).catch(() => {});
                         };
-                        setHasStream(true);
                     }
                 })
                 .catch(() => {
@@ -37,7 +39,7 @@ export default function CameraFeed({ videoRef, isScanning = false, onManualScan 
                 stream.getTracks().forEach((track) => track.stop());
             }
         };
-    }, [videoRef]);
+    }, [videoRef, onCameraReady]);
 
     return (
         <section className="camera-section">
@@ -45,11 +47,11 @@ export default function CameraFeed({ videoRef, isScanning = false, onManualScan 
             <div className="camera-section__header">
                 <div className="camera-section__status">
                     <span className="camera-section__dot" aria-hidden="true" />
-                    <span>Camera Active</span>
+                    <span>Camera {hasStream ? "Active" : "Connecting..."}</span>
                 </div>
                 <div className="camera-section__actions-top">
                     <span className="camera-section__meta">
-                        {isScanning ? "Scanning face expression..." : "Reading expression"}
+                        {isScanning ? "Scanning face expression..." : "Auto-biometric radar"}
                     </span>
                     {onManualScan && (
                         <button
@@ -64,7 +66,7 @@ export default function CameraFeed({ videoRef, isScanning = false, onManualScan 
                 </div>
             </div>
 
-            {/* Video Viewport Container */}
+            {/* Video Viewport Container (Black screen on load) */}
             <div className="camera-section__viewport">
                 <video
                     ref={videoRef}
@@ -76,16 +78,13 @@ export default function CameraFeed({ videoRef, isScanning = false, onManualScan 
                 />
 
                 {!hasStream && (
-                    <div className="camera-section__fallback">
-                        <img
-                            src={FALLBACK_IMAGE}
-                            alt="Facial expression feed preview"
-                            className="camera-section__poster"
-                        />
-                        <div className="camera-section__vignette" />
+                    <div className="camera-section__loading-screen">
+                        <div className="camera-section__radar-pulse" />
+                        <span className="camera-section__loading-text">Initializing Camera Feed...</span>
                     </div>
                 )}
             </div>
         </section>
     );
 }
+

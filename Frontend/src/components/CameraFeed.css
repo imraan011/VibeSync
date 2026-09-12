@@ -62,7 +62,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9.5;
-    background-color: #12131a;
+    background-color: #08090d;
     border-radius: 16px;
     overflow: hidden;
     border: 1px solid var(--border-subtle);
@@ -76,29 +76,55 @@
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s ease;
 }
 
 .camera-section__video--active {
     opacity: 1;
 }
 
-.camera-section__fallback {
+.camera-section__loading-screen {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    background-color: #06070a;
 }
 
-.camera-section__poster {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.camera-section__radar-pulse {
+    width: 44px;
+    height: 44px;
+    border: 2px solid rgba(45, 212, 191, 0.4);
+    border-radius: 50%;
+    animation: radarPulse 1.8s infinite ease-out;
 }
 
-.camera-section__vignette {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 60% 50%, rgba(0, 0, 0, 0.1) 0%, rgba(12, 13, 18, 0.6) 100%);
-    pointer-events: none;
+@keyframes radarPulse {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.8;
+        box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.5);
+    }
+    70% {
+        transform: scale(1.3);
+        opacity: 0.2;
+        box-shadow: 0 0 0 15px rgba(45, 212, 191, 0);
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
 }
+
+.camera-section__loading-text {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
+

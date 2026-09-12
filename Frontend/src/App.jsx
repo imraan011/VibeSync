@@ -6,12 +6,15 @@ import CameraFeed from "./components/CameraFeed";
 import NowPlayingDisk from "./components/NowPlayingDisk";
 import LibraryView from "./components/LibraryView";
 import PlayerBar from "./components/PlayerBar";
+import UploadModal from "./components/UploadModal";
 import { MOOD_DISPLAY_MAP } from "./data/mockData";
 
 const API_BASE_URL = "http://localhost:3000";
 
 export default function App() {
     const videoRef = useRef(null);
+    const hasInitialScannedRef = useRef(false);
+
     const [activeTab, setActiveTab] = useState("live-space");
     const [activeMoodId, setActiveMoodId] = useState("neutral");
     const [currentMoodLabel, setCurrentMoodLabel] = useState("Calm & Centered");
@@ -21,6 +24,8 @@ export default function App() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
     const [isModelsLoaded, setIsModelsLoaded] = useState(false);
+    const [isCameraReady, setIsCameraReady] = useState(false);
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
     // Random track selector helper
     const pickRandomTrack = (list, excludeId) => {
@@ -30,7 +35,7 @@ export default function App() {
         return pool[Math.floor(Math.random() * pool.length)];
     };
 
-    // MongoDB se songs fetch karo
+    // MongoDB se songs fetch karo aur auto-play trigger karo
     const fetchSongsByMood = useCallback(async (mood, autoPlay = true) => {
         try {
             const res = await axios.get(`${API_BASE_URL}/songs?mood=${mood}`);
@@ -107,7 +112,38 @@ export default function App() {
         }
     }, [isModelsLoaded]);
 
-    // Song end par fresh scan & non-repeating random selection
+    // Camera ready callback
+    const handleCameraReady = useCallback(() => {
+        setIsCameraReady(true);
+    }, []);
+
+    // Auto-detect emotion on page load/reload jaise hi models aur camera ready ho
+    useEffect(() => {
+        if (isModelsLoaded && isCameraReady && !hasInitialScannedRef.current) {
+            const autoInitialScan = async () => {
+                // Video frame settle hone ke liye 600ms buffer
+                await new Promise((r) => setTimeout(r, 600));
+                const result = await detectFace();
+                if (result && result.mood) {
+                    hasInitialScannedRef.current = true;
+                    const moodInfo = MOOD_DISPLAY_MAP[result.mood] || {
+                        label: result.mood.toUpperCase(),
+                        id: result.mood,
+                    };
+                    setActiveMoodId(result.mood);
+                    setCurrentMoodLabel(moodInfo.label);
+                    setMatchScore(result.confidence || 90);
+                    fetchSongsByMood(result.mood, true);
+                } else {
+                    // Agar face turant nahi mila to neutral playlist play kar do
+                    fetchSongsByMood("neutral", true);
+                }
+            };
+            autoInitialScan();
+        }
+    }, [isModelsLoaded, isCameraReady, detectFace, fetchSongsByMood]);
+
+    // Song end par automatically face detect karke agla gaana queue karo
     const handleSongEnd = async () => {
         const finishedId = activeTrack?._id || activeTrack?.id;
         const result = await detectFace();
@@ -131,7 +167,7 @@ export default function App() {
         }
     };
 
-    // Instant manual face scan trigger button handler
+    // Instant manual face scan trigger
     const handleManualScan = async () => {
         const result = await detectFace();
         if (result && result.mood) {
@@ -146,20 +182,32 @@ export default function App() {
         }
     };
 
+    // New song upload success handler
+    const handleUploadSuccess = (newSong) => {
+        if (newSong && newSong.mood === activeMoodId) {
+            setTracks((prev) => [newSong, ...prev]);
+        }
+    };
+
     return (
         <div className="app-container">
-            {/* Top Navigation Bar with active tab control */}
-            <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
+            {/* Top Navigation Bar with Upload Button */}
+            <Navbar
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                onOpenUpload={() => setIsUploadModalOpen(true)}
+            />
 
             <main className="main-content">
                 {activeTab === "live-space" ? (
                     <>
-                        {/* Left Panel: Camera Stream View */}
+                        {/* Left Panel: Camera Stream View with pure black background on load */}
                         <div className="left-panel">
                             <CameraFeed
                                 videoRef={videoRef}
                                 isScanning={isScanning}
                                 onManualScan={handleManualScan}
+                                onCameraReady={handleCameraReady}
                             />
                         </div>
 
@@ -176,7 +224,7 @@ export default function App() {
                 ) : (
                     /* Full-width Lazy Loaded Music Library View */
                     <div style={{ gridColumn: "1 / -1", width: "100%" }}>
-                        <LibraryView />
+                        <LibraryView onOpenUpload={() => setIsUploadModalOpen(true)} />
                     </div>
                 )}
             </main>
@@ -188,6 +236,14 @@ export default function App() {
                 onTogglePlay={() => setIsPlaying(!isPlaying)}
                 onSongEnd={handleSongEnd}
             />
+
+            {/* Song Upload Modal */}
+            <UploadModal
+                isOpen={isUploadModalOpen}
+                onClose={() => setIsUploadModalOpen(false)}
+                onUploadSuccess={handleUploadSuccess}
+            />
         </div>
     );
 }
+
