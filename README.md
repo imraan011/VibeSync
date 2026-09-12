@@ -3,9 +3,7 @@
 > **VibeSync** is a modern, full-stack mood-based music player that analyzes your facial expressions in real time through your webcam and instantly streams songs that match how you feel.
 > **No manual playlists, no endless searching** — just glance at the camera, and VibeSync curates the sonic vibe (Calm, Happy, Reflective, Energetic, Intense, Tense, Raw) directly in your browser.
 
-**Live Demo:** [Add frontend URL here after deploy]
-**Backend Health Check:** [Add backend URL + /health here]
-
+ 
  
 ## ✨ Features
 
