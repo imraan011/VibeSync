@@ -1,114 +1,228 @@
-# ✦ VibeSync — Biometric Emotion-Driven Audio Instrument
+# 🎵 VibeSync — Biometric Mood-Adaptive Music Player
 
-> **VibeSync** is an intelligent audio-reactive platform that bridges human emotion and sound synthesis. By translating real-time facial micro-expressions into dynamic acoustic frequencies, VibeSync transforms passive music listening into an interactive, emotionally resonant experience.
+> **VibeSync** is a modern, full-stack mood-based music player that analyzes your facial expressions in real time through your webcam and instantly streams songs that match how you feel.
+> **No manual playlists, no endless searching** — just glance at the camera, and VibeSync curates the sonic vibe (Calm, Happy, Reflective, Energetic, Intense, Tense, Raw) directly in your browser.
+
+**Live Demo:** [Add frontend URL here after deploy]
+**Backend Health Check:** [Add backend URL + /health here]
+
+ 
+## ✨ Features
+
+- 🎭 **Client-Side Face Expression Detection** — Uses pre-trained neural networks (`face-api.js` with `TinyFaceDetector` and `FaceExpressionNet`) to classify facial landmarks into 7 distinct emotional states in real time.
+- 💿 **Interactive Spinning Vinyl Player** — Features a realistic spinning vinyl record disc with concentric acoustic grooves, animated soundwave equalizer bars, and dynamic mood-colored glowing aura.
+- 🖼️ **Album Cover Art Support** — Embedded album artwork positioned in the center spindle of the vinyl record with automatic mood-tinted ambient reflections.
+- 🎛️ **Precision Player Bar** — Timeline seek scrubber with live timestamp progress, quick `↺ 5s` rewind and `↻ 5s` forward skip buttons, variable playback speed cycles (`1x`, `1.25x`, `1.5x`, `2x`, `0.75x`), and horizontal volume/mute sliders.
+- 🔄 **Smart Fallback & Uninterrupted Queue** — After every track ends, the app re-scans your expression and picks a fresh (randomized) track from the matching mood; if a face is temporarily out of frame or the camera is blocked, it falls back to a random track from the current mood so music never gets stuck.
+- ⬆️ **Dual-Media Song Upload** — Upload custom audio tracks (`.mp3` / `.wav`) alongside custom cover art (`.jpg` / `.png`) with auto-title extraction and mood tagging.
+- ☁️ **Cloud Storage Integration** — Audio tracks and album cover images are streamed via ImageKit cloud storage (`/songs` and `/covers`).
+- 🎨 **Minimalist Design System** — Sleek, ultra-clean white aesthetic powered by vanilla CSS variables and responsive glassmorphism touches.
 
 ---
 
-## 👁️ The Vision & Concept
-
-Traditional music streaming requires manual curation — searching playlists, skipping tracks, and guessing what fits your current state of mind. 
-
-**VibeSync inverts this dynamic**:
-Instead of searching for music, the instrument **observes and adapts to you**. Using client-side computer vision and real-time facial telemetry, the system continuously gauges your emotional resonance and streams audio tuned to your immediate state.
+## 🏗️ Architecture
 
 ```
-┌─────────────────┐       ┌────────────────────────┐       ┌─────────────────────────┐
-│  Live Biometric │ ───▶  │ Real-Time Neural Radar │ ───▶  │ Dynamic Audio Resonance │
-│  Webcam Stream  │       │ (Client-Side Edge AI)  │       │ & Mood-Reactive Theming │
-└─────────────────┘       └────────────────────────┘       └─────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│                   React Frontend (Vite)                │
+│                                                        │
+│  ┌───────────────────────┐    ┌─────────────────────┐  │
+│  │   Webcam Stream &     │    │  NowPlayingDisk     │  │
+│  │  face-api.js Edge AI  │    │  (Spinning Vinyl)   │  │
+│  └───────────┬───────────┘    └──────────▲──────────┘  │
+│              │                           │             │
+│              └────────────┐   ┌──────────┘             │
+│                           ▼   │                        │
+│                     ┌───────────────┐                  │
+│                     │  PlayerBar    │                  │
+│                     │ (Audio State) │                  │
+│                     └───────┬───────┘                  │
+└─────────────────────────────┼──────────────────────────┘
+                              │ REST API Requests
+                              ▼
+┌────────────────────────────────────────────────────────┐
+│                   Express Backend (Node.js)            │
+│                                                        │
+│  ┌───────────────────────┐    ┌─────────────────────┐  │
+│  │  Multer File Stream   │───▶│   ImageKit Cloud    │  │
+│  │   (Memory Storage)    │    │  (/songs & /covers) │  │
+│  └───────────┬───────────┘    └─────────────────────┘  │
+│              │                                         │
+│              ▼                                         │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │    MongoDB Atlas (MoodyPlayer DB / songs col)    │  │
+│  └──────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ⚡ Core Capabilities
+## ⚙️ How It Works
 
-### 1. Zero-Friction Instant Playback
-The moment the biometric sensor connects, the neural engine evaluates initial facial landmarks, categorizes the dominant emotion, and begins streaming matching soundscapes without requiring a single click.
-
-### 2. Continuous 13-Second Biometric Radar
-Operating silently in the background, a non-intrusive scanning sweep analyzes facial expressions at regular intervals. If your mood organically transitions (e.g., from deep focus to high energy), the system updates your vibe queue seamlessly without interrupting the current track.
-
-### 3. Noise-Filtered Debounce Engine
-Human facial expressions are naturally dynamic and fleeting. VibeSync employs a confidence-weighted debounce mechanism requiring consecutive verified states to filter out inadvertent blinks or momentary shifts, ensuring stable, reliable playback.
-
-### 4. Vital-Signs Instrument Panel Interface
-Moving away from generic dashboard templates, VibeSync adopts an oscilloscope/vital-signs visual identity:
-- **Asymmetric Viewfinder**: Biometric reticle targeting, focal crosshairs, and live telemetry feeds.
-- **Dynamic Chromatic Adaptation**: The entire interface — from background aura to waveforms and timeline scrubbers — dynamically morphs its color spectrum to reflect the detected mood.
-- **Oscillating Waveform Equalizer**: Playback-synchronized soundwave bars reflecting live audio activity.
-- **Single-Stream Global Audio Engine**: Centralized audio controller with continuous playback, seamless seek scrubbers, and volume management.
+1. **Camera Feed & Initialization** — On page load, the browser initializes the webcam and loads lightweight client-side Face-API model weights into memory.
+2. **Biometric Emotion Extraction** — The client-side detector evaluates facial expressions and determines the dominant emotion along with a confidence match score (e.g., `92% Match`).
+3. **Dynamic Playlist Query** — The detected mood triggers a request to the backend (`GET /songs?mood=:mood`), fetching curated tracks stored in MongoDB.
+4. **Instant Vinyl Playback** — The matched song loads into the spinning vinyl disc, animated equalizer, and bottom player bar without manual intervention.
+5. **Seamless Loop on Track End** — When a song completes, the system automatically scans for updated facial expressions and picks a fresh (randomized) track from the matching mood; if no face is detected, it smoothly continues with a random track from the active mood instead.
+6. **Song Upload Modal** — Users can upload new audio files and cover art with mood tagging, which get uploaded to ImageKit and saved in MongoDB.
 
 ---
 
 ## 🎨 The Emotional Spectrum
 
-VibeSync maps facial expression vectors to tailored acoustic spaces and chromatic wavelengths:
-
-| Emotion | Frequency Profile | Chromatic Signature | Acoustic Archetype |
+| Emotion | Display Label | Signature Color | Acoustic Archetype |
 | :--- | :--- | :--- | :--- |
-| **Happy** | Uplifting, rhythmic, bright | Warm Amber (`#F5B942`) | Synthwave, Acoustic Pop, Upbeat Grooves |
-| **Calm / Neutral** | Smooth, steady, low-tempo | Teal Cyan (`#3FC7C0`) | Lo-Fi, Ambient Textures, Chillstep |
-| **Melancholy** | Atmospheric, reflective, minor key | Deep Indigo (`#5B6EE1`) | Neo-Classical Piano, Ambient Solitude |
-| **Energetic** | High BPM, punchy dynamics | Magenta Rose (`#E8447A`) | Cyberpunk, Future Bass, Electro Pulse |
-| **Fierce** | Heavy distortion, driving bass | Warm Red-Orange (`#E85D4C`) | Hard Rock, Cinematic Trailer |
-| **Mystic** | Suspenseful, textured, deep | Muted Violet (`#8A6FE8`) | Dark Ambient, Cinematic Mystery |
+| **Neutral** | Calm & Centered | `#0d9488` (Teal) | Lo-Fi, Ambient, Chillstep |
+| **Happy** | Happy & Uplifting | `#d97706` (Amber) | Upbeat Grooves, Pop, Feel-Good |
+| **Sad** | Reflective & Melancholic | `#9333ea` (Purple) | Neo-Classical Piano, Slow Acoustics |
+| **Surprised** | Energetic & Surprised | `#e11d48` (Rose) | Future Bass, Electronic, Dance |
+| **Angry** | Intense & Focused | `#dc2626` (Red) | Hard Rock, Heavy Distortion, Driving Bass |
+| **Fearful** | Tense & Suspenseful | `#7c3aed` (Violet) | Cinematic Mystery, Dark Ambient |
+| **Disgusted** | Raw & Alternative | `#db2777` (Pink) | Grunge, Alternative, Indie Rock |
 
 ---
 
-## 🏛️ System Architecture
+## 🛠️ Tech Stack
+
+### Frontend
+- **Framework & Tooling**: React 19, Vite
+- **Edge Biometric AI**: `face-api.js` (`TinyFaceDetector` + `FaceExpressionNet`)
+- **API Client**: Axios
+- **Styling**: Vanilla CSS with custom tokens, modern typography (`Plus Jakarta Sans`), and keyframe animations
+
+### Backend
+- **Server Runtime**: Node.js & Express.js
+- **Database**: MongoDB with Mongoose ORM
+- **File Handling**: Multer (Memory Storage)
+- **Cloud Storage & CDN**: ImageKit Node SDK (v7+)
+- **Security & Config**: CORS, Dotenv
+
+---
+
+## 🔌 API Endpoints
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/songs` | Uploads an audio file (`audio`) and optional cover image (`cover`) via multipart form data |
+| `GET` | `/songs` | Fetches all songs stored in the database |
+| `GET` | `/songs?mood=:mood` | Fetches all songs matching a specific mood category |
+
+---
+
+## 📂 Project Structure
 
 ```
-                                  ┌───────────────────────────┐
-                                  │      VibeSync Client      │
-                                  │  (React 19 + Vite + CSS)  │
-                                  └─────────────┬─────────────┘
-                                                │
-                         ┌──────────────────────┴──────────────────────┐
-                         ▼                                             ▼
-            ┌─────────────────────────┐                   ┌──────────────────────────┐
-            │   Edge Neural Engine    │                   │   Central Audio State    │
-            │ (face-api.js / WebGL)   │                   │  (PlayerBar & Queue UI)  │
-            └─────────────────────────┘                   └────────────┬─────────────┘
-                                                                       │ REST API
-                                                                       ▼
-                                                          ┌──────────────────────────┐
-                                                          │    Node / Express API    │
-                                                          └────────────┬─────────────┘
-                                                                       │
-                                        ┌──────────────────────────────┴──────────────────────────────┐
-                                        ▼                                                             ▼
-                           ┌──────────────────────────┐                                  ┌──────────────────────────┐
-                           │      MongoDB Atlas       │                                  │   CDN Streaming Buffer   │
-                           │  (Mood Catalog Metadata) │                                  │   (Direct Audio Streams) │
-                           └──────────────────────────┘                                  └──────────────────────────┘
+Moody Player/
+├── Backend/
+│   ├── src/
+│   │   ├── db/
+│   │   │   └── db.js                 # MongoDB connection logic
+│   │   ├── models/
+│   │   │   └── song.model.js         # Mongoose schema for songs
+│   │   ├── routes/
+│   │   │   └── song.routes.js        # GET & POST /songs API routes
+│   │   ├── service/
+│   │   │   └── storage.service.js    # ImageKit upload service
+│   │   └── app.js                    # Express application configuration
+│   ├── server.js                     # Backend HTTP server entry
+│   └── package.json
+│
+├── Frontend/
+│   ├── public/
+│   │   └── models/                   # Pre-trained face-api.js neural network weights
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── CameraFeed.jsx        # Camera stream viewport & scan button
+│   │   │   ├── CameraFeed.css
+│   │   │   ├── Navbar.jsx            # Top navigation brand & upload trigger
+│   │   │   ├── Navbar.css
+│   │   │   ├── NowPlayingDisk.jsx    # Spinning vinyl disc with cover art & equalizer
+│   │   │   ├── NowPlayingDisk.css
+│   │   │   ├── PlayerBar.jsx         # Bottom audio timeline, 5s skip, speed & volume
+│   │   │   ├── PlayerBar.css
+│   │   │   ├── UploadModal.jsx       # Multi-part modal for audio & cover art upload
+│   │   │   └── UploadModal.css
+│   │   ├── data/
+│   │   │   └── mockData.js           # Mood display labels, colors & mappings
+│   │   ├── App.jsx                   # Core state, biometric scan loop & audio orchestrator
+│   │   ├── index.css                 # Clean minimal white design system & typography
+│   │   └── main.jsx                  # React application root mount
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+│
+└── README.md
 ```
 
 ---
 
-## 🛠️ Technology Stack
+## 🚀 Getting Started (Local Setup)
 
-- **Frontend & Biometrics**:
-  - React 19 & Vite
-  - `face-api.js` (Tiny Face Detector & Face Expression Recognition Net)
-  - Vanilla CSS Design System with custom CSS variables & dynamic keyframe animations
-  - Google Fonts (`Space Grotesk` for data/telemetry & `Inter` for UI clarity)
+### Prerequisites
+- Node.js (v18+)
+- A MongoDB connection string (local or MongoDB Atlas)
+- An ImageKit account (public key, private key, URL endpoint)
 
-- **Backend & Catalog Service**:
-  - Node.js & Express
-  - MongoDB & Mongoose ORM
-  - Scalable RESTful API standard (`{ success, data }`)
-  - ImageKit Cloud Storage Integration
+### 1. Clone the repo
+```bash
+git clone <your-repo-url>
+cd "Moody Player"
+```
+
+### 2. Backend setup
+```bash
+cd Backend
+npm install
+```
+Create `Backend/.env` (use `.env.example` as reference) with:
+```
+MONGO_URI=<your MongoDB connection string>
+IMAGEKIT_PUBLIC_KEY=<your ImageKit public key>
+IMAGEKIT_PRIVATE_KEY=<your ImageKit private key>
+IMAGEKIT_URL_ENDPOINT=<your ImageKit URL endpoint>
+FRONTEND_URL=http://localhost:5173
+PORT=3000
+```
+Start the backend:
+```bash
+npm run dev
+```
+
+### 3. Frontend setup
+```bash
+cd Frontend
+npm install
+```
+Create `Frontend/.env` with:
+```
+VITE_API_BASE_URL=http://localhost:3000
+```
+Start the frontend:
+```bash
+npm run dev
+```
+
+The app should now be running at `http://localhost:5173`, connected to the backend at `http://localhost:3000`.
 
 ---
 
-## 📦 High-Level Setup Overview
+## ☁️ Deployment
 
-VibeSync is structured as a decoupled client-server architecture:
+### Backend (Render)
+- Root directory: `Backend/`
+- Build command: `npm install`
+- Start command: `npm start` (or `node server.js`)
+- Environment variables to set: `MONGO_URI`, `FRONTEND_URL`, `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT` (`PORT` is set automatically by Render)
 
-1. **Backend Service**: Configured with standard MongoDB URI and port bindings. Includes an automated seed catalog for instant out-of-the-box acoustic datasets.
-2. **Frontend Client**: Client-side application hosting pre-trained neural network models in the public directory and communicating with the API via environment-driven endpoints.
+### Frontend (Vercel)
+- Root directory: `Frontend/`
+- Environment variable to set: `VITE_API_BASE_URL` = your deployed Render backend URL
+- `vercel.json` handles SPA routing so client-side routes don't 404 on refresh
+
+After deploying both, update the **Live Demo** and **Backend Health Check** links at the top of this README.
 
 ---
 
 ## 📄 License
-This project is open-source under the ISC License.
+
+*This project is available for educational and portfolio purposes*
