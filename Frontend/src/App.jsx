@@ -19,13 +19,15 @@ export default function App() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isUploadOpen, setIsUploadOpen] = useState(false);
 
-    // Mood ke hisaab se gaana fetch & play karo
-    const loadSong = async (targetMood = mood, shouldPlay = true) => {
+    // Mood ke hisaab se agla gaana fetch & play karo (exclude current track if available)
+    const loadSong = async (targetMood = mood, shouldPlay = true, excludeId = null) => {
         try {
             const res = await axios.get(`${API_BASE_URL}/songs?mood=${targetMood}`);
             const list = res.data.songs || [];
             if (list.length > 0) {
-                const random = list[Math.floor(Math.random() * list.length)];
+                const pool = excludeId ? list.filter((t) => (t._id || t.id) !== excludeId) : list;
+                const finalPool = pool.length > 0 ? pool : list;
+                const random = finalPool[Math.floor(Math.random() * finalPool.length)];
                 setActiveTrack(random);
                 if (shouldPlay) setIsPlaying(true);
             }
@@ -34,34 +36,39 @@ export default function App() {
         }
     };
 
-    // Face detection scan trigger
+    // Face detection scan trigger (agar face na mile to same mood ka agla gaana play karo)
     const handleScanFace = async () => {
+        const currentId = activeTrack?._id || activeTrack?.id;
         const video = videoRef.current;
-        if (!video || video.readyState < 2 || video.videoWidth === 0) return;
 
-        try {
-            const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.25 });
-            const detection = await faceapi.detectSingleFace(video, options).withFaceExpressions();
+        if (video && video.readyState >= 2 && video.videoWidth > 0) {
+            try {
+                const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.25 });
+                const detection = await faceapi.detectSingleFace(video, options).withFaceExpressions();
 
-            if (!detection) return;
+                if (detection) {
+                    const expressions = detection.expressions;
+                    let dominant = "neutral";
+                    let maxScore = 0;
+                    for (const [exp, score] of Object.entries(expressions)) {
+                        if (score > maxScore) {
+                            maxScore = score;
+                            dominant = exp;
+                        }
+                    }
 
-            // Dominant emotion nikaalo
-            const expressions = detection.expressions;
-            let dominant = "neutral";
-            let maxScore = 0;
-            for (const [exp, score] of Object.entries(expressions)) {
-                if (score > maxScore) {
-                    maxScore = score;
-                    dominant = exp;
+                    setMood(dominant);
+                    setMatchScore(Math.round(maxScore * 100));
+                    loadSong(dominant, true, currentId);
+                    return;
                 }
+            } catch (err) {
+                console.warn("Scan error:", err);
             }
-
-            setMood(dominant);
-            setMatchScore(Math.round(maxScore * 100));
-            loadSong(dominant, true);
-        } catch (err) {
-            console.warn("Scan error:", err);
         }
+
+        // Face detect na hone par ya error aane par same mood ka agla gaana continue karo
+        loadSong(mood, true, currentId);
     };
 
     // Initial models load and start default playback
