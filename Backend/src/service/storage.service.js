@@ -11,21 +11,20 @@ const imagekit = new ImageKit({
  * @param {Express.Multer.File} file - multer memoryStorage file object
  * @returns {Promise<Object>} ImageKit upload result with url, fileId etc.
  */
-async function uploadFile(file) {
+async function uploadFile(file, folder = "/songs") {
     // ImageKit.toFile static method se Buffer ko Uploadable me convert karo
     const uploadable = await ImageKit.toFile(file.buffer, file.originalname);
 
     const result = await imagekit.files.upload({
         file: uploadable,
-
-        //random name for each file
-        fileName:new Mongoose.Types.ObjectId().toString(),
-        folder: "/songs",
+        fileName: new Mongoose.Types.ObjectId().toString(),
+        folder: folder,
     });
 
-    console.log(result);
+    console.log("ImageKit Upload Result:", result?.url);
 
     return result;
 }
 
 module.exports = uploadFile;
+

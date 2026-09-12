@@ -3,13 +3,13 @@ import "./NowPlayingDisk.css";
 import { MOOD_DISPLAY_MAP } from "../data/mockData";
 
 export default function NowPlayingDisk({
-    activeTrack,
-    activeMoodId = "neutral",
+    track,
+    mood = "neutral",
     matchScore = 92,
     isPlaying = false,
 }) {
-    const moodInfo = MOOD_DISPLAY_MAP[activeMoodId] || {
-        label: activeMoodId.toUpperCase(),
+    const moodInfo = MOOD_DISPLAY_MAP[mood] || {
+        label: mood.toUpperCase(),
         color: "#2dd4bf",
     };
 
@@ -53,9 +53,17 @@ export default function NowPlayingDisk({
                                 background: `radial-gradient(circle, ${moodInfo.color}33 0%, #161824 100%)`
                             }}
                         >
-                            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style={{ color: moodInfo.color }}>
-                                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                            </svg>
+                            {track?.cover ? (
+                                <img
+                                    src={track.cover}
+                                    alt="Album Art"
+                                    style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
+                                />
+                            ) : (
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" style={{ color: moodInfo.color }}>
+                                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                                </svg>
+                            )}
                         </div>
                         {/* Spindle hole */}
                         <div className="vinyl-record__hole" />
@@ -72,10 +80,10 @@ export default function NowPlayingDisk({
             {/* Song Meta Information */}
             <div className="now-playing-panel__meta">
                 <h2 className="now-playing-panel__title">
-                    {activeTrack?.title || "Listening for Facial Mood..."}
+                    {track?.title || "Listening for Facial Mood..."}
                 </h2>
                 <p className="now-playing-panel__artist">
-                    {activeTrack?.artist || "Look at camera to curate music"}
+                    {track?.artist || "Look at camera to curate music"}
                 </p>
 
                 {/* Animated Audio Equalizer Bars */}

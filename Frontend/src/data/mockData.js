@@ -1,9 +1,4 @@
-// VibeSync static configuration for navigation and mood mappings
-
-export const NAV_LINKS = [
-    { id: "live-space", label: "Live Space", active: true },
-    { id: "library", label: "Library", active: false },
-];
+// VibeSync static configuration for mood mappings
 
 export const MOOD_DISPLAY_MAP = {
     neutral: { label: "Calm & Centered", color: "#0d9488", id: "neutral" },
@@ -14,4 +9,5 @@ export const MOOD_DISPLAY_MAP = {
     fearful: { label: "Tense & Suspenseful", color: "#7c3aed", id: "fearful" },
     disgusted: { label: "Raw & Alternative", color: "#db2777", id: "disgusted" },
 };
+
 

@@ -13,8 +13,8 @@ const MOOD_EMOJI_MAP = {
 };
 
 export default function PlayerBar({
-    currentTrack,
-    activeMoodId = "happy",
+    track,
+    mood = "happy",
     isPlaying = false,
     onTogglePlay,
     onSongEnd,
@@ -23,52 +23,34 @@ export default function PlayerBar({
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [volume, setVolume] = useState(80);
-    const [prevVolume, setPrevVolume] = useState(80);
-    const [isMuted, setIsMuted] = useState(false);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
-    const moodKey = currentTrack?.mood || activeMoodId || "happy";
-    const moodMeta = MOOD_DISPLAY_MAP[moodKey] || {
-        label: "Happy",
-        color: "#f59e0b",
-    };
+    const moodKey = track?.mood || mood || "happy";
+    const moodMeta = MOOD_DISPLAY_MAP[moodKey] || { label: "Happy", color: "#f59e0b" };
     const moodEmoji = MOOD_EMOJI_MAP[moodKey] || "😄";
 
-    // Audio play/pause sync
+    // Play/Pause synchronization
     useEffect(() => {
-        if (!audioRef.current || !currentTrack?.audio) return;
+        if (!audioRef.current || !track?.audio) return;
         if (isPlaying) {
             audioRef.current.play().catch(() => {});
         } else {
             audioRef.current.pause();
         }
-    }, [isPlaying, currentTrack]);
+    }, [isPlaying, track]);
 
-    // Volume change handler
-    const handleVolumeChange = (newVol) => {
-        setVolume(newVol);
-        if (newVol > 0) setIsMuted(false);
-        if (audioRef.current) {
-            audioRef.current.volume = newVol / 100;
-        }
+    // Volume change
+    const handleVolume = (val) => {
+        setVolume(val);
+        if (audioRef.current) audioRef.current.volume = val / 100;
     };
 
-    // Mute toggle handler
+    // Toggle mute
     const handleToggleMute = () => {
-        if (isMuted || volume === 0) {
-            const restore = prevVolume > 0 ? prevVolume : 80;
-            setVolume(restore);
-            setIsMuted(false);
-            if (audioRef.current) audioRef.current.volume = restore / 100;
-        } else {
-            setPrevVolume(volume);
-            setVolume(0);
-            setIsMuted(true);
-            if (audioRef.current) audioRef.current.volume = 0;
-        }
+        handleVolume(volume === 0 ? 80 : 0);
     };
 
-    // Skip time (+5s or -5s)
+    // Skip +/- 5s
     const handleSkip = (seconds) => {
         if (!audioRef.current) return;
         const newTime = Math.min(Math.max(0, audioRef.current.currentTime + seconds), duration || 1000);
@@ -76,27 +58,14 @@ export default function PlayerBar({
         setCurrentTime(newTime);
     };
 
-    // Interactive scrubber seek
-    const handleSeekChange = (e) => {
-        const seekVal = Number(e.target.value);
-        setCurrentTime(seekVal);
-        if (audioRef.current) {
-            audioRef.current.currentTime = seekVal;
-        }
-    };
-
     // Cycle playback speed
     const handleCycleSpeed = () => {
         const speeds = [1, 1.25, 1.5, 2, 0.75];
-        const currentIndex = speeds.indexOf(playbackSpeed);
-        const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
+        const nextSpeed = speeds[(speeds.indexOf(playbackSpeed) + 1) % speeds.length];
         setPlaybackSpeed(nextSpeed);
-        if (audioRef.current) {
-            audioRef.current.playbackRate = nextSpeed;
-        }
+        if (audioRef.current) audioRef.current.playbackRate = nextSpeed;
     };
 
-    // Format seconds to m:ss
     const formatTime = (secs) => {
         if (isNaN(secs) || secs <= 0) return "0:00";
         const m = Math.floor(secs / 60);
@@ -105,15 +74,13 @@ export default function PlayerBar({
     };
 
     const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
-    const volumePercent = volume;
 
     return (
         <footer className="player-bar" aria-label="Audio Playback Bar">
-            {/* Native Audio Element */}
-            {currentTrack?.audio && (
+            {track?.audio && (
                 <audio
                     ref={audioRef}
-                    src={currentTrack.audio}
+                    src={track.audio}
                     onTimeUpdate={() => {
                         if (audioRef.current) {
                             setCurrentTime(audioRef.current.currentTime);
@@ -131,27 +98,26 @@ export default function PlayerBar({
             )}
 
             <div className="player-bar__container">
-                {/* Left: Track Information with Mood Badge */}
+                {/* Left: Track Information */}
                 <div className="player-bar__left">
                     <div className="player-bar__art-wrap">
                         <div className="player-bar__art-box">
-                            {currentTrack?.cover ? (
-                                <img src={currentTrack.cover} alt="Cover" className="player-bar__art-img" />
+                            {track?.cover ? (
+                                <img src={track.cover} alt="Cover" className="player-bar__art-img" />
                             ) : (
                                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style={{ color: moodMeta.color }}>
                                     <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                                 </svg>
                             )}
                         </div>
-                        {/* Circular Mood Emoji Badge */}
                         <div className="player-bar__emoji-badge" title={moodMeta.label}>
                             {moodEmoji}
                         </div>
                     </div>
 
                     <div className="player-bar__info">
-                        <span className="player-bar__title" title={currentTrack?.title || "No Track Selected"}>
-                            {currentTrack?.title || "No Track Selected"}
+                        <span className="player-bar__title" title={track?.title || "No Track Selected"}>
+                            {track?.title || "No Track Selected"}
                         </span>
                         <div className="player-bar__mood-tag" style={{ color: moodMeta.color }}>
                             <span>{moodEmoji}</span>
@@ -162,27 +128,22 @@ export default function PlayerBar({
 
                 {/* Center: Controls + Timeline Slider */}
                 <div className="player-bar__center">
-                    {/* Top Control Buttons */}
                     <div className="player-bar__controls">
-                        {/* 5s Rewind */}
                         <button
                             type="button"
                             className="player-bar__skip-btn"
                             onClick={() => handleSkip(-5)}
                             title="Rewind 5 seconds"
-                            aria-label="Rewind 5 seconds"
                         >
                             <span className="skip-icon">↺</span>
                             <span className="skip-text">5s</span>
                         </button>
 
-                        {/* Main Play / Pause Button */}
                         <button
                             type="button"
                             className="player-bar__play-main"
                             onClick={onTogglePlay}
                             title={isPlaying ? "Pause" : "Play"}
-                            aria-label={isPlaying ? "Pause" : "Play"}
                         >
                             {isPlaying ? (
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
@@ -196,20 +157,17 @@ export default function PlayerBar({
                             )}
                         </button>
 
-                        {/* 5s Forward */}
                         <button
                             type="button"
                             className="player-bar__skip-btn"
                             onClick={() => handleSkip(5)}
                             title="Forward 5 seconds"
-                            aria-label="Forward 5 seconds"
                         >
                             <span className="skip-text">5s</span>
                             <span className="skip-icon">↻</span>
                         </button>
                     </div>
 
-                    {/* Bottom: Timeline Scrubber Slider */}
                     <div className="player-bar__timeline-row">
                         <span className="player-bar__time">{formatTime(currentTime)}</span>
                         <div className="player-bar__slider-wrap">
@@ -219,7 +177,11 @@ export default function PlayerBar({
                                 max={duration || 100}
                                 step="0.1"
                                 value={currentTime}
-                                onChange={handleSeekChange}
+                                onChange={(e) => {
+                                    const seekVal = Number(e.target.value);
+                                    setCurrentTime(seekVal);
+                                    if (audioRef.current) audioRef.current.currentTime = seekVal;
+                                }}
                                 className="player-bar__seek-slider"
                                 aria-label="Audio Timeline Scrubber"
                                 style={{
@@ -231,9 +193,8 @@ export default function PlayerBar({
                     </div>
                 </div>
 
-                {/* Right: Speed, Volume, Mute */}
+                {/* Right: Speed & Volume */}
                 <div className="player-bar__right">
-                    {/* Playback Speed Pill */}
                     <button
                         type="button"
                         className="player-bar__speed-btn"
@@ -243,30 +204,24 @@ export default function PlayerBar({
                         {playbackSpeed}x
                     </button>
 
-                    {/* Volume Box */}
                     <div className="player-bar__volume-box">
                         <button
                             type="button"
                             className="player-bar__vol-icon-btn"
                             onClick={handleToggleMute}
-                            title={isMuted || volume === 0 ? "Unmute" : "Mute"}
-                            aria-label="Mute / Unmute"
+                            title={volume === 0 ? "Unmute" : "Mute"}
                         >
-                            {isMuted || volume === 0 ? (
+                            {volume === 0 ? (
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
                                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                                     <line x1="23" y1="9" x2="17" y2="15" />
                                     <line x1="17" y1="9" x2="23" y2="15" />
                                 </svg>
-                            ) : volume < 50 ? (
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                                </svg>
                             ) : (
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
                                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                                    {volume >= 50 && <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />}
                                 </svg>
                             )}
                         </button>
@@ -275,12 +230,12 @@ export default function PlayerBar({
                             type="range"
                             min="0"
                             max="100"
-                            value={isMuted ? 0 : volume}
-                            onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                            value={volume}
+                            onChange={(e) => handleVolume(Number(e.target.value))}
                             className="player-bar__vol-slider"
                             aria-label="Volume Slider"
                             style={{
-                                background: `linear-gradient(to right, #eab308 0%, #eab308 ${isMuted ? 0 : volumePercent}%, rgba(15, 23, 42, 0.15) ${isMuted ? 0 : volumePercent}%, rgba(15, 23, 42, 0.15) 100%)`,
+                                background: `linear-gradient(to right, #eab308 0%, #eab308 ${volume}%, rgba(15, 23, 42, 0.15) ${volume}%, rgba(15, 23, 42, 0.15) 100%)`,
                             }}
                         />
                     </div>
